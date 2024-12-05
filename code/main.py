@@ -32,15 +32,15 @@ class Game:
         
         # enemy timer
         self.enemy_event = pygame.event.custom_type()
-        pygame.time.set_timer(self.enemy_event, 5000)
+        pygame.time.set_timer(self.enemy_event, 8000)
         self.spawn_positions = []
         # audio
         self.shoot_sound = pygame.mixer.Sound(join('audio','shoot.wav'))
         self.shoot_sound.set_volume(0.4)
         self.impact_sound = pygame.mixer.Sound(join('audio','impact.ogg'))
-        self.music_sound = pygame.mixer.Sound(join('audio','music.wav'))
-        self.music_sound.set_volume(0.3)
-        self.music_sound.play(loops=-1)
+        # self.music_sound = pygame.mixer.Sound(join('audio','music.wav'))
+        # self.music_sound.set_volume(0.3)
+        # self.music_sound.play(loops=-1)
 
         # player health setting
         self.damage_cooldown = 1200  # 1 second cooldown between damage
@@ -56,13 +56,21 @@ class Game:
         
         folders = list(walk(join('images','enemies')))[0][1]
         self.enemy_frames = {}
+        self.air_enemy_frames = {}
         for folder in folders:
             for folder_path, _, file_names in walk(join('images','enemies',folder)):
-                self.enemy_frames[folder] = []
-                for file_name in sorted(file_names, key= lambda name: int(name.split('.')[0])):
-                    full_path = join(folder_path,file_name)
-                    surf = pygame.image.load(full_path).convert_alpha()
-                    self.enemy_frames[folder].append(surf)
+                if folder == 'bat':
+                    self.air_enemy_frames[folder] = []
+                    for file_name in sorted(file_names, key= lambda name: int(name.split('.')[0])):
+                        full_path = join(folder_path,file_name)
+                        surf = pygame.image.load(full_path).convert_alpha()
+                        self.air_enemy_frames[folder].append(surf)
+                else:
+                    self.enemy_frames[folder] = []
+                    for file_name in sorted(file_names, key= lambda name: int(name.split('.')[0])):
+                        full_path = join(folder_path,file_name)
+                        surf = pygame.image.load(full_path).convert_alpha()
+                        self.enemy_frames[folder].append(surf)
 
     def input(self):
         if pygame.mouse.get_pressed()[0] and self.can_shoot:
@@ -143,27 +151,8 @@ class Game:
             else:
                 self.spawn_positions.append((obj.x, obj.y))
                 
-        grid = [
-            [0, 0, 0, 1, 0],
-            [0, 1, 0, 1, 0],
-            [0, 1, 0, 0, 0],
-            [0, 0, 1, 1, 0],
-            [0, 0, 0, 0, 0]
-        ]
-                
         self.grid = self.create_grid_from_sprites()  # Game map grid
-        
-        # Enemy(
-        #     pos=choice(self.spawn_positions),  # Starting position
-        #     frames=choice(list(self.enemy_frames.values())),  # Animation frames
-        #     groups=(self.all_sprites, self.enemy_sprites),  # Add to the all_sprites group
-        #     player=self.player,  # Reference to the player
-        #     collision_sprites=self.collision_sprites,  # Group with obstacles
-        #     # danger_area_sprites=self.dangarea_sprites,
-        #     grid=self.grid,  # The pathfinding grid
-        # )
-        # self.grid = grid
-                    
+            
     def bullet_collision(self):
         if self.bullet_sprites:
             for bullet in self.bullet_sprites:
@@ -205,16 +194,27 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.runnig = False
                 if event.type == self.enemy_event:
+                    choice((Enemy(
+                        pos=choice(self.spawn_positions), 
+                        frames= choice(list(self.enemy_frames.values())),  
+                        groups=(self.all_sprites, self.enemy_sprites),  
+                        player=self.player,  
+                        collision_sprites=self.collision_sprites, 
+                        grid=self.grid, 
+                        inAir=False
+                    ),
                     Enemy(
-                        pos=choice(self.spawn_positions),  # Starting position
-                        frames=choice(list(self.enemy_frames.values())),  # Animation frames
-                        groups=(self.all_sprites, self.enemy_sprites),  # Add to the all_sprites group
-                        player=self.player,  # Reference to the player
-                        collision_sprites=self.collision_sprites,  # Group with obstacles
-                        # danger_area_sprites=self.dangarea_sprites,
-                        grid=self.grid,  # The pathfinding grid
+                        pos=choice(self.spawn_positions), 
+                        frames= choice(list(self.air_enemy_frames.values())),  
+                        groups=(self.all_sprites, self.enemy_sprites),  
+                        player=self.player,  
+                        collision_sprites=self.collision_sprites, 
+                        grid=self.grid, 
+                        inAir=True
                     )
-                    # Enemy(choice(self.spawn_positions),choice(list(self.enemy_frames.values())), (self.all_sprites, self.enemy_sprites), self.player, self.collision_sprites)
+                    ))
+                    
+                # Enemy(choice(self.spawn_positions),choice(list(self.enemy_frames.values())), (self.all_sprites, self.enemy_sprites), self.player, self.collision_sprites)
                     
             # update 
             self.gun_timer()
