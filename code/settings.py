@@ -2,5 +2,14 @@ import pygame
 from os.path import join 
 from os import walk
 
+# WINDOW_WIDTH, WINDOW_HEIGHT = 1960,1280 
 WINDOW_WIDTH, WINDOW_HEIGHT = 1280,720 
 TILE_SIZE = 64
+PLAYER_INITIAL_HP = 100 
+
+
+# GRID_WIDTH = WINDOW_WIDTH // TILE_SIZE  # 640 // 32 = 20 columns
+# GRID_HEIGHT = WINDOW_HEIGHT // TILE_SIZE  # 480 // 32 = 15 rows
+
+GRID_WIDTH = 64
+GRID_HEIGHT = 50

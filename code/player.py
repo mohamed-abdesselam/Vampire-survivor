@@ -13,6 +13,10 @@ class Player(pygame.sprite.Sprite):
         self.direction = pygame.Vector2()
         self.speed = 400
         self.collision_sprites = collision_sprites
+        
+        # Health Points (HP)
+        self.max_hp = PLAYER_INITIAL_HP
+        self.current_hp = self.max_hp
     
     def load_images(self):
         self.frames = {'left':[], 'right':[], 'up':[], 'down':[]}
@@ -58,6 +62,19 @@ class Player(pygame.sprite.Sprite):
         # animate
         self.frame_index = self.frame_index + 5 * dt if self.direction else 0
         self.image = self.frames[self.state][int(self.frame_index) % len(self.frames[self.state])]
+    
+    def take_damage(self, amount):
+        """Reduce HP by the specified amount and check for death."""
+        self.current_hp -= amount
+        if self.current_hp <= 0:
+            self.current_hp = 0
+            self.die()
+    
+    def heal(self, amount):
+        """Increase HP by the specified amount, without exceeding max HP."""
+        self.current_hp += amount
+        if self.current_hp > self.max_hp:
+            self.current_hp = self.max_hp
     
     def update(self,dt):
         self.input()

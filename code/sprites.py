@@ -1,5 +1,6 @@
 from settings import *
 from math import atan2,degrees
+import heapq
 
 class Sprite(pygame.sprite.Sprite):
     def __init__(self, pos, serf, groups):
@@ -13,6 +14,40 @@ class CollisionSprite(pygame.sprite.Sprite):
         super().__init__(groups)
         self.image = serf
         self.rect = self.image.get_frect(topleft = pos)
+    
+class HPBar(pygame.sprite.Sprite):
+    def __init__(self, player, groups):
+        super().__init__(groups)
+        self.player = player  # Link to the player object
+        
+        # Health bar settings
+        self.bar_width = 100
+        self.bar_height = 10
+        self.border_color = (255, 255, 255)  # White border
+        self.background_color = (50, 50, 50)  # Dark gray background
+        self.health_color = (255, 0, 0)  # Red for health
+        
+        # Create a surface for the health bar
+        self.image = pygame.Surface((self.bar_width, self.bar_height))
+        self.rect = self.image.get_rect()
+    
+    def update(self, _):
+        # Update position below the player
+        self.rect.centerx = self.player.rect.centerx
+        self.rect.centery = self.player.rect.bottom + 15  # 15 pixels below the player
+        
+        # Calculate health ratio
+        health_ratio = self.player.current_hp / self.player.max_hp
+        
+        # Clear the health bar surface
+        self.image.fill(self.background_color)  # Fill with background color
+        
+        # Draw the health portion
+        health_width = int(self.bar_width * health_ratio)
+        pygame.draw.rect(self.image, self.health_color, (0, 0, health_width, self.bar_height))
+        
+        # Draw border
+        pygame.draw.rect(self.image, self.border_color, (0, 0, self.bar_width, self.bar_height), 2)
           
 class Gun(pygame.sprite.Sprite):
     def __init__(self,player,groups):
@@ -62,7 +97,7 @@ class Bullet(pygame.sprite.Sprite):
         if pygame.time.get_ticks() - self.spawm_time >= self.lifetime:
             self.kill()
     
-class Enemy(pygame.sprite.Sprite):
+class Enemydsa(pygame.sprite.Sprite):
     def __init__(self, pos, frames, groups, player, collision_sprites):
         super().__init__(groups)
         self.player = player 
@@ -128,4 +163,6 @@ class Enemy(pygame.sprite.Sprite):
             self.move(dt)
             self.animate(dt)
         else:
-            self.death_timer()
+            self.death_timer()  
+            
+            
