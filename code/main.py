@@ -32,8 +32,10 @@ class Game:
         
         # enemy timer
         self.enemy_event = pygame.event.custom_type()
-        pygame.time.set_timer(self.enemy_event, 8000)
+        pygame.time.set_timer(self.enemy_event, 5000)
         self.spawn_positions = []
+
+        
         # audio
         self.shoot_sound = pygame.mixer.Sound(join('audio','shoot.wav'))
         self.shoot_sound.set_volume(0.4)

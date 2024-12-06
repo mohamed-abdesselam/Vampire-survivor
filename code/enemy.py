@@ -109,6 +109,36 @@ class Enemy(pygame.sprite.Sprite):
             path.append(node)
             node = previous_nodes.get(node)
         self.path = path[::-1]  # Reverse the path to go from start to goal
+        
+    def dijkstra(self, start, goal):
+        queue = [(0, start)]
+        distances = {start: 0}
+        previous_nodes = {start: None}
+        visited = set()
+
+        while queue:
+            current_distance, current_node = heapq.heappop(queue)
+            if current_node in visited:
+                continue
+            visited.add(current_node)
+
+            if current_node == goal:
+                break
+
+            for neighbor in self.get_neighbors(current_node):
+                new_distance = current_distance + 1
+                if neighbor not in distances or new_distance < distances[neighbor]:
+                    distances[neighbor] = new_distance
+                    previous_nodes[neighbor] = current_node
+                    heapq.heappush(queue, (new_distance, neighbor))
+
+        # Reconstruct path
+        path = []
+        node = goal
+        while node is not None:
+            path.append(node)
+            node = previous_nodes.get(node)
+        self.path = path[::-1]  # Reverse path
 
     def move_along_path(self, dt):
         if self.path:
@@ -138,7 +168,8 @@ class Enemy(pygame.sprite.Sprite):
             self.player_cell = player_cell
             self.enemy_cell = enemy_cell
             if self.inAir:
-                self.a_star(enemy_cell, player_cell)  # Use A* for in-air enemies
+                # self.a_star(enemy_cell, player_cell)  # Use A* for in-air enemies
+                self.dijkstra(enemy_cell, player_cell)  # Use dijkstra for in-air enemies
             else:
                 self.a_star(enemy_cell, player_cell)  # For non-in-air enemies (same behavior)
 
